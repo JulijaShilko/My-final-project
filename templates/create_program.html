@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    {{ form.discription.label }} {{ form.discription }}
+    <br />
+    {% for task in form.tasks %}
+        {{ task.label }} {{ task }}
+        {{ task.csrf_token }}
+        {{ task.delete_task }}
+    {% endfor %}
+    {{ form.add_task }}
+    {{ form.create }}
+</form>
+
+
+<div class='content-section'>
+    <form method='POST'>
+        {{ form.hidden_tag() }}
+        <div class='form-group'>
+            {{ form.discription.label(class="form-control-label") }} 
+            {% if form.discription.errors %}
+                {{ form.discription(class="form-control form-control-lg is-invalid") }}
+                <div class='invalid-feedback'>
+                    {% for error in form.discription.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.discription(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class='form-group'>
+            {% for task in form.tasks %}
+                {{ form.task.label(class="form-control-label") }}
+                {{ form.task(class="form-control form-control-lg") }}
+            {% endfor %}
+        </div>
+        <div class='form-group'>
+            {{ form.add_task(class="btn btn-outline-info") }}
+        </div>
+        <div class='form-group'>
+            {{ form.create(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

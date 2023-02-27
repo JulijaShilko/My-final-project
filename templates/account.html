@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<p>Your current username is: {{ current_user.name }}</p>
+<p>Your current email is: {{ current_user.email }}</p>
+<P>You can update your details below</P>
+
+<div class='content-section'>
+    <form method='POST'>
+        {{ form.hidden_tag() }}
+        <div class='form-group'>
+            {{ form.name.label(class="form-control-label") }}
+
+            {% if form.name.errors %}
+                {{ form.name(class="form-control form-control-lg is-invalid") }}
+                <div class='invalid-feedback'>
+                    {% for error in form.name.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.name(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class='form-group'>
+            {{ form.email.label(class="form-control-label") }}
+            {% if form.email.errors %}
+                {{ form.email(class="form-control form-control-lg is-invalid") }}
+                <div class='invalid-feedback'>
+                    {% for error in form.email.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.email(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class='form-group'>
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+
+{% endblock content %}
