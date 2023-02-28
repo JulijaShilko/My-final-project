@@ -1,45 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<p>Your current username is: {{ current_user.name }}</p>
-<p>Your current email is: {{ current_user.email }}</p>
-<P>You can update your details below</P>
-
-<div class='content-section'>
-    <form method='POST'>
+<div class="row mt-4">
+  <div class="col-md-3">
+    <h3 class="text-center">{{ current_user.name }}</h3>
+    {% if current_user.image %}
+      <img style="width: 260px" src="{{ url_for('static', filename='img/' + current_user.image) }}" alt="">
+    {% else %}
+      <img style="width: 260px" src="{{ url_for('static', filename='img/default.png') }}" alt="photo">
+    {% endif %}
+    <form id="photo-form" action="{{ url_for('update_photo') }}" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-        <div class='form-group'>
-            {{ form.name.label(class="form-control-label") }}
-
-            {% if form.name.errors %}
-                {{ form.name(class="form-control form-control-lg is-invalid") }}
-                <div class='invalid-feedback'>
-                    {% for error in form.name.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.name(class="form-control form-control-lg") }}
-            {% endif %}
-        </div>
-        <div class='form-group'>
-            {{ form.email.label(class="form-control-label") }}
-            {% if form.email.errors %}
-                {{ form.email(class="form-control form-control-lg is-invalid") }}
-                <div class='invalid-feedback'>
-                    {% for error in form.email.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.email(class="form-control form-control-lg") }}
-            {% endif %}
-        </div>
-        <div class='form-group'>
-            {{ form.submit(class="btn btn-outline-info") }}
-        </div>
+      <div class="mt-2">
+        <input type="file" id="photo-input" name="photo">
+        <button type="submit" class="btn btn-primary" id="photo-submit">Upload</button>
+      </div>
     </form>
+  </div>
+  <div class="col-md-9">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+      <a class="btn btn-primary me-md-2" href="{{ url_for('create') }}">Create program</a>
+    </div>
+    <h2 class="mb-3">All programs I have created:</h2>
+    {% if my_programs %}
+        {% for my_program in my_programs %}
+            <h5>Description</h5>
+            <p>{{ my_program.description }}</p>
+            <h6>Tasks to complete:</h6>
+            <ul>
+            {% for task in my_program.tasks %}
+                <li>{{ task.task }}</li>
+            {% endfor %}
+            </ul>
+        <p><span style="font-weight: bolder;">Created by: </span>{{ my_program.user.name }}</p>
+        <a class="btn btn-primary me-md-2" href="{{ url_for('delete', id=my_program['id']) }}">Delete</a>
+        <hr>
+    {% endfor %}
+  
+    {% endif %}
+  </div>
 </div>
 
-{% endblock content %}
+{% endblock %}

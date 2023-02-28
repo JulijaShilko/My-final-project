@@ -41,3 +41,19 @@
 #     </form>
 # </body>
 # </html>
+
+
+
+    <!-- <div class="row">
+      {% for program in current_user.programs %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ program.discription }}</h5>
+              <p class="card-text">Created on {{ program.date.strftime('%B %d, %Y') }}</p>
+              <a href="{{ url_for('program', program_id=program.id) }}" class="btn btn-primary">View program</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div> -->

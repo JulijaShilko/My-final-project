@@ -2,26 +2,40 @@
 
 {% block content %}
 
-<form method="POST" action="">
-    {{ form.hidden_tag() }}
-    {{ form.discription.label }} {{ form.discription }}
-    <br />
-    {% for task in form.tasks %}
-        <div class="form-row task-row">
-            <div class="form-group col-md-11">
-                {{ task.label }} {{ task }}
-                {{ task.csrf_token }}
-                {{ task.delete_task }}
-            </div>
-            <div class="form-group col-md-1">
-                <button type="button" class="btn btn-danger btn-sm delete-task">Delete task</button>
-            </div>
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.description.label(class="form-control-label") }}
+            {% if form.description.errors %}
+                {{ form.description(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.description.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.description(class="form-control form-control-lg") }}
+            {% endif %}
         </div>
-    {% endfor %}
-    {{ form.add_task }}
-    {{ form.create }}
-</form>
-
+        {% for task in form.tasks %}
+            <div class="form-row task-row">
+                <div class="form-group col-md-11">
+                    {{ task(class="form-control form-control-lg") }}
+                    {{ task.csrf_token }}
+                    {{ task.delete_task }}
+                </div>
+                <div class="form-group col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm delete-task">Delete task</button>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="form-group">
+            {{ form.add_task(class="btn btn-outline-primary") }}
+            {{ form.create(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
 <script>
     // Обработчик клика по кнопке "Delete task"
     document.querySelectorAll('.delete-task').forEach(button => {
@@ -31,5 +45,4 @@
         });
     });
 </script>
-
 {% endblock content %}

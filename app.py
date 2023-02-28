@@ -6,6 +6,7 @@ import forms
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
 from datetime import datetime
+from werkzeug.utils import secure_filename
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -33,7 +34,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(50), unique=True, nullable=False)
-    # image = db.Column(db.LargeBinary, nullable=True, default='img/default.jpg')
+    image = db.Column(db.String(120), nullable=True, default='default.png')
     programs = db.relationship('Program', backref='user') #user's created programs. can be many
     followed_programs = db.relationship('Program', secondary=helper_table, backref='users') #user's followed programs. can be many
 
@@ -41,7 +42,7 @@ class Program(db.Model):
     __tablename__ = "programs"
     id = id = db.Column(db.Integer, primary_key=True)
     date = db.Column(DateTime, default=datetime.now())
-    discription = db.Column(db.String(700), nullable=False)
+    description = db.Column(db.String(700), nullable=False)
     tasks = db.relationship('Task', backref='program')
     author_id = db.Column(db.Integer, db.ForeignKey('users.id')) #user = program author. can be only one
 
@@ -100,6 +101,40 @@ def login():
     return render_template('login.html', form=form)
 
 
+@app.route('/account', methods=["GET", "POST"])
+@login_required
+def account():
+    form = forms.PhotoForm()
+    my_programs = Program.query.filter_by(author_id=current_user.id)
+    return render_template("account.html", form=form, my_programs=my_programs)
+
+@app.route('/update_photo', methods=['POST'])
+@login_required
+def update_photo():
+    form = forms.PhotoForm()
+    if form.validate_on_submit():
+        if form.photo.data:
+            # Удаление старого фото пользователя (если оно существует)
+            if current_user.image != 'default.png':
+                try:
+                    os.remove(os.path.join(app.root_path, 'static/img', current_user.image))
+                except:
+                    pass
+
+            # Сохранение нового фото пользователя
+            f = form.photo.data
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(app.root_path, 'static/img', filename))
+            current_user.image = filename
+            db.session.commit()
+            flash('Your profile picture has been updated!', 'success')
+            return redirect(url_for('account'))
+
+    flash('An error occurred while updating your profile picture.', 'danger')
+    return redirect(url_for('account'))
+
+
+
 @app.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
@@ -115,7 +150,7 @@ def create():
 
     if form.validate_on_submit():
         # Создать новый объект программы
-        program = Program(discription=form.discription.data, author_id=current_user.id)
+        program = Program(description=form.description.data, author_id=current_user.id)
         db.session.add(program)
         db.session.commit()
         
@@ -133,79 +168,15 @@ def create():
     
     return render_template('create.html', form=form)
 
-# @app.route('/entries')
-# @login_required
-# def entries():
-#     my_entries = Entry.query.filter_by(user_id=current_user.id).all()
-#     return render_template('entries.html', all_entries=my_entries, datetime=datetime)
-
-
-# @app.route('/all_entries')
-# @login_required
-# def all_entries():
-#     all_entries = Entry.query.all()
-#     return render_template('all_entries.html', all_entries=all_entries, datetime=datetime)
-
-
-@app.route('/account', methods=["GET", "POST"])
+@app.route('/delete/<id>')
 @login_required
-def account():
-    form = forms.UpdateAccountForm()
-    if form.validate_on_submit():
-        current_user.name = form.name.data
-        current_user.email = form.email.data
-        db.session.commit()
-        flash("Your account has been updated!", "success")
-        return redirect(url_for("account"))
-    elif request.method == 'GET':
-        form.name.data = current_user.name
-        form.email.data = current_user.email
-    return render_template("account.html", form=form)
-
-
-# @app.route('/balance')
-# @login_required
-# def balance():
-#     all_entries = Entry.query.filter_by(user_id=current_user.id)
-#     balance = 0
-#     for entry in all_entries:
-#         if entry.income:
-#             balance += entry.sum
-#         else:
-#             balance -= entry.sum
-#     return render_template('balance.html', balance=balance)
-
-
-# @app.route('/delete/<id>')
-# @login_required
-# def delete(id):
-#     entry = Entry.query.get(id)
-#     if entry.user_id != current_user.id:
-#         return redirect(url_for('index'))
-#     db.session.delete(entry)
-#     db.session.commit()
-#     return redirect(url_for('entries'))
-
-
-# @app.route('/update/<id>', methods=['GET', 'POST'])
-# @login_required
-# def update(id):
-#     entry = Entry.query.get(id)
-#     if entry.user_id != current_user.id:
-#         return redirect(url_for('index'))
-#     form = forms.EntryForm()
-#     if form.validate_on_submit():
-#         print(form.sum.data)
-#         entry.sum = form.sum.data
-#         entry.income = form.income.data
-#         db.session.commit()
-#         flash('You have updated entry successfully', 'success')
-#         return redirect(url_for('entries'))
-#     elif request.method == 'GET':
-#         form.sum.data = entry.sum
-#         form.income.data = entry.income
-#     return render_template('update.html', form=form)
-
+def delete(id):
+    program = Program.query.get(id)
+    if program.author_id != current_user.id:
+        return redirect(url_for('account'))
+    db.session.delete(program)
+    db.session.commit()
+    return redirect(url_for('account'))
 
 @app.route('/logout')
 def logout():

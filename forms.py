@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Float
 from wtforms.validators import Email, DataRequired, EqualTo, ValidationError, Length, Regexp
 import app
 from flask_login import current_user
+from flask_wtf.file import FileField, FileAllowed
 
 
 class RegisterForm(FlaskForm):
@@ -40,30 +41,12 @@ class TaskForm(Form):
 
 
 class ProgramForm(FlaskForm):
-    discription = StringField('Discription', validators=[DataRequired()])
+    description = StringField('Discription', validators=[DataRequired()])
     tasks = FieldList(FormField(TaskForm), min_entries=1)
     add_task = SubmitField('Add Task')
     delete_task = SubmitField('Delete Task')
     create = SubmitField('Create')
 
-
-class UpdateAccountForm(FlaskForm):
-    name = StringField('Name', [DataRequired()])
-    email = StringField('Email', [DataRequired(), Email()])
-    submit = SubmitField('Update')
-
-    def validate_email(self, email):
-        with app.app.app_context():
-            user = app.User.query.filter_by(email=email.data).first()
-            if current_user.email == email.data:
-                return
-            elif user:
-                raise ValidationError('This email is already in use')
-
-    def validate_name(self, name):
-        with app.app.app_context():
-            user = app.User.query.filter_by(name=name.data).first()
-            if current_user.name == name.data:
-                return
-            elif user:
-                raise ValidationError('This name is already in use')
+class PhotoForm(FlaskForm):
+    photo = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+    submit = SubmitField('Save')
