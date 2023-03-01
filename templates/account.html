@@ -4,6 +4,7 @@
 <div class="row mt-4">
   <div class="col-md-3">
     <h3 class="text-center">{{ current_user.name }}</h3>
+    <p>I have completed {{ num }} program(s)</p>
     {% if current_user.image %}
       <img style="width: 260px" src="{{ url_for('static', filename='img/' + current_user.image) }}" alt="">
     {% else %}
@@ -13,13 +14,13 @@
         {{ form.hidden_tag() }}
       <div class="mt-2">
         <input type="file" id="photo-input" name="photo">
-        <button type="submit" class="btn btn-primary" id="photo-submit">Upload</button>
+        <button style="background-color: #7dba34; border-color: #7dba34;" type="submit" class="btn btn-primary" id="photo-submit">Upload</button>
       </div>
     </form>
   </div>
   <div class="col-md-9">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-      <a class="btn btn-primary me-md-2" href="{{ url_for('create') }}">Create program</a>
+      <a style="background-color: #7dba34; border-color: #7dba34;" class="btn btn-primary me-md-2" href="{{ url_for('create') }}">Create program</a>
     </div>
     <h2 class="mb-3">All programs I have created:</h2>
     {% if my_programs %}
@@ -33,7 +34,7 @@
             {% endfor %}
             </ul>
         <p><span style="font-weight: bolder;">Created by: </span>{{ my_program.user.name }}</p>
-        <a class="btn btn-primary me-md-2" href="{{ url_for('delete', id=my_program['id']) }}">Delete</a>
+        <a style="background-color: #7dba34; border-color: #7dba34;" class="btn btn-primary me-md-2" href="{{ url_for('delete', id=my_program['id']) }}">Delete</a>
         <hr>
     {% endfor %}
   
@@ -42,3 +43,4 @@
 </div>
 
 {% endblock %}
+

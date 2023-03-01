@@ -25,8 +25,12 @@ login_manager.login_message = 'Log in to see this page.'
 #tables
 
 helper_table = db.Table('helper',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-    db.Column('program_id', db.Integer, db.ForeignKey('programs.id')))
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), nullable=False),
+    db.Column('program_id', db.Integer, db.ForeignKey('programs.id'), nullable=False))
+
+completed_programs_table = db.Table('completed_programs',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), nullable=False),
+    db.Column('program_id', db.Integer, db.ForeignKey('programs.id'), nullable=False))
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -37,6 +41,7 @@ class User(db.Model, UserMixin):
     image = db.Column(db.String(120), nullable=True, default='default.png')
     programs = db.relationship('Program', backref='user') #user's created programs. can be many
     followed_programs = db.relationship('Program', secondary=helper_table, backref='users') #user's followed programs. can be many
+    completed_programs = db.relationship('Program', secondary=completed_programs_table, backref='users_completed')
 
 class Program(db.Model):
     __tablename__ = "programs"
@@ -106,7 +111,9 @@ def login():
 def account():
     form = forms.PhotoForm()
     my_programs = Program.query.filter_by(author_id=current_user.id)
-    return render_template("account.html", form=form, my_programs=my_programs)
+    completed_programs_num = len(current_user.completed_programs)
+    return render_template("account.html", form=form, my_programs=my_programs, num=completed_programs_num)
+
 
 @app.route('/update_photo', methods=['POST'])
 @login_required
@@ -134,7 +141,6 @@ def update_photo():
     return redirect(url_for('account'))
 
 
-
 @app.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
@@ -159,10 +165,8 @@ def create():
             task_obj = Task(task=task['task'], program_id=program.id)
             db.session.add(task_obj)
         
-        # Записать изменения в базу данных
         db.session.commit()
         
-        # Перенаправить пользователя на главную страницу
         flash('Program has been successfully created!', 'success')
         return redirect(url_for('account'))
     
@@ -177,6 +181,45 @@ def delete(id):
     db.session.delete(program)
     db.session.commit()
     return redirect(url_for('account'))
+
+@app.route('/all_programs', methods=["GET", "POST"])
+def all_programs():
+    all_programs = Program.query.all()
+    return render_template("all_programs.html", all_programs=all_programs)
+
+@app.route('/follow/<int:id>', methods=["GET", "POST"])
+@login_required
+def follow(id):
+    program = Program.query.get(id)
+    current_user.followed_programs.append(program)
+    db.session.commit()
+    flash("You are now following this program")
+    return redirect(url_for('all_programs'))
+
+@app.route('/followed_programs', methods=["GET", "POST"])
+@login_required
+def followed_programs():
+    followed_programs = current_user.followed_programs
+    form = forms.CompleteForm()
+    return render_template('followed_programs.html', followed_programs=followed_programs, form=form)
+
+@app.route('/remove/<id>')
+@login_required
+def remove(id):
+    program = Program.query.get(id)
+    if program in current_user.followed_programs:
+        current_user.followed_programs.remove(program)
+        db.session.commit()
+    return redirect(url_for('followed_programs'))
+
+@app.route('/complete/<id>', methods=["POST"])
+@login_required
+def complete(id):
+    program = Program.query.get(id)
+    current_user.completed_programs.append(program)
+    db.session.commit()
+    flash(f"Congratulations! You have completed the program: {program.description}")
+    return redirect(url_for('followed_programs'))
 
 @app.route('/logout')
 def logout():

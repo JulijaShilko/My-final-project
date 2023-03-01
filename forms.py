@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, FloatField, FieldList, FormField, Form
-from wtforms.validators import Email, DataRequired, EqualTo, ValidationError, Length, Regexp
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, FloatField, FieldList, FormField, Form, IntegerField, TextAreaField
+from wtforms.validators import Email, DataRequired, EqualTo, ValidationError, Length, Regexp, NumberRange
 import app
 from flask_login import current_user
 from flask_wtf.file import FileField, FileAllowed
@@ -41,7 +41,7 @@ class TaskForm(Form):
 
 
 class ProgramForm(FlaskForm):
-    description = StringField('Discription', validators=[DataRequired()])
+    description = TextAreaField('Discription', validators=[DataRequired()])
     tasks = FieldList(FormField(TaskForm), min_entries=1)
     add_task = SubmitField('Add Task')
     delete_task = SubmitField('Delete Task')
@@ -50,3 +50,8 @@ class ProgramForm(FlaskForm):
 class PhotoForm(FlaskForm):
     photo = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Save')
+
+class CompleteForm(FlaskForm):
+    submit = SubmitField('Complete')
+
+    
