@@ -6,9 +6,9 @@
     <h3 class="text-center">{{ current_user.name }}</h3>
     <p>I have completed {{ num }} program(s)</p>
     {% if current_user.image %}
-      <img style="width: 260px" src="{{ url_for('static', filename='img/' + current_user.image) }}" alt="">
+      <img class="col-md-11" src="{{ url_for('static', filename='img/' + current_user.image) }}" alt="">
     {% else %}
-      <img style="width: 260px" src="{{ url_for('static', filename='img/default.png') }}" alt="photo">
+      <img class="col-md-11" src="{{ url_for('static', filename='img/default.png') }}" alt="photo">
     {% endif %}
     <form id="photo-form" action="{{ url_for('update_photo') }}" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
@@ -18,10 +18,7 @@
       </div>
     </form>
   </div>
-  <div class="col-md-9">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
-      <a style="background-color: #7dba34; border-color: #7dba34;" class="btn btn-primary me-md-2" href="{{ url_for('create') }}">Create program</a>
-    </div>
+  <div class="col-md-7">
     <h2 class="mb-3">All programs I have created:</h2>
     {% if my_programs %}
         {% for my_program in my_programs %}
@@ -33,12 +30,17 @@
                 <li>{{ task.task }}</li>
             {% endfor %}
             </ul>
-        <p><span style="font-weight: bolder;">Created by: </span>{{ my_program.user.name }}</p>
-        <a style="background-color: #7dba34; border-color: #7dba34;" class="btn btn-primary me-md-2" href="{{ url_for('delete', id=my_program['id']) }}">Delete</a>
+        <p><span style="font-weight:bolder;">Created by: </span>{{ my_program.user.name }}</p>
+        <a style="background-color: #ba3434; border-color: #ba3434;" class="btn btn-primary me-md-2" href="{{ url_for('delete', id=my_program['id']) }}">Delete</a>
         <hr>
     {% endfor %}
   
     {% endif %}
+  </div>
+  <div class="col-md-2">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+      <a style="background-color: #7dba34; border-color: #7dba34;" class="btn btn-primary me-md-2" href="{{ url_for('create') }}">Create program</a>
+    </div>
   </div>
 </div>
 

@@ -16,7 +16,7 @@
             </ul>
         <p><span style="font-weight: bolder;">Created by: </span>{{ program.user.name }}</p>
         <div class="d-flex">
-            <a style="background-color: #7dba34; border-color: #7dba34;" class="btn btn-primary me-md-2" href="{{ url_for('remove', id=program['id']) }}">Delete</a>
+            <a style="background-color: #7dba34; border-color: #7dba34;" class="btn btn-primary me-md-2" href="{{ url_for('remove', id=program['id']) }}">Unfollow</a>
             {% if program in current_user.completed_programs %}
                 <p class="my-1">Congratulations! You have completed this program.</p>
             {% else %}

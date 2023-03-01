@@ -25,14 +25,14 @@
                     {{ task.csrf_token }}
                     {{ task.delete_task }}
                 </div>
-                <div class="form-group col-md-1">
-                    <button type="button" class="btn btn-danger btn-sm delete-task">Delete task</button>
+                <div class="form-group col-md-2">
+                    <button style="background-color: #ba3434; border-color: #ba3434;" type="button" class="btn btn-primary me-md-2 delete-task">Delete task</button>
                 </div>
             </div>
         {% endfor %}
-        <div class="form-group">
-            {{ form.add_task(class="btn btn-primary me-md-2") }}
-            {{ form.create(class="btn btn-primary me-md-2") }}
+        <div style="margin-top: 10px;" class="form-group">
+            {{ form.add_task(style="background-color: #7dba34; border-color: #7dba34;", class="btn btn-primary me-md-2") }}
+            {{ form.create(style="background-color: #7dba34; border-color: #7dba34;", class="btn btn-primary me-md-2") }}
         </div>
     </form>
 </div>
